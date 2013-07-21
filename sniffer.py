@@ -81,7 +81,7 @@ class State(object):
     if not os.path.exists(state_dir):
       os.makedirs(state_dir)
     with open(os.path.join(state_dir, str(time.time())), 'w') as fh:
-      for k, v in connection_state.iteritems():
+      for key, v in connection_state.iteritems():
         fh.write('%s %r\n' % (' '.join(map(str, key)), v))
 
     print streams_count
@@ -104,7 +104,6 @@ class State(object):
     self.in_shutdown_e.set()
 
 def main(argv):
-
   if len(argv) > 1:
     file_name = argv[1]
   else:
@@ -114,15 +113,15 @@ def main(argv):
   t.daemon = True
   t.start()
 
-  if file_name is None:
-    try:
+  try:
+    if file_name is None:
       scapy.sniff(count=100000, prn=s.ProcessOnePacket)
-    except Exception as e:
-      print 'Exception'
-      print e
-      s.Shutdown()
-  else:
-    scapy.sniff(offline=file_name, prn=s.ProcessOnePacket)
+    else:
+      scapy.sniff(offline=file_name, prn=s.ProcessOnePacket)
+  except Exception as e:
+    print 'Exception'
+    print e
+    s.Shutdown()
   s.AssembleStreams()
 
 
